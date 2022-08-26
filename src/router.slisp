@@ -1,3 +1,8 @@
+;;;; ROUTER IMPLEMENTATION
+;;;; =====================
+
+;;; router function related
+;;; -----------------------
 (defun parse-search-params (params)
   (|> (new URLSearchParams params)
       (.entries)
@@ -5,6 +10,9 @@
                 (setf acc key value)
                 acc)
                (hash-create))))
+
+(defun get-base-uri ()
+  (getf document 'body 'baseURI))
 
 (defun get-location ()
   (hash :url (getf window 'location 'href)
@@ -15,6 +23,9 @@
         :path (getf window 'location 'pathname)
         :hash (getf window 'location 'hash)
         :search (parse-search-params (getf window 'location 'search))))
+
+(defun get-error-route (route)
+  (+ "silux/route-error: found no matching route definition for " route))
 
 (defun partial-match? (a b i)
   (eql? (getf b i) a))
@@ -87,14 +98,25 @@
                       ((> (getf b 'r) (getf a 'r)) 1)
                       :else 0)))
         (first))))
-  
-  
-      
-    
+
+(provide
+  (defun router (route-map)
+    (let ((finder (route-finder (get-base-ui) 
+                                (hash-pairs route-map))))
+      (#({ state } emit)
+        (let ((route (finder (getf window 'location 'pathname))))
+          (if (exists? route)
+              (.v route
+                  (hash :state state
+                        :route (hash-merge (get-location)
+                                           (hash :params (getf route 'p)
+                                                 :slug (getf route 's))))
+                  emit)
+              (get-error-route (getf window 'location 'pathname))))))))
 
 
-
-
+;;; router-plugin related
+;;; ---------------------
 (defsum router-action ((move-to url action)
                        (resolve url action)))
 
@@ -139,16 +161,3 @@
           (.add-event-listener window "popstate" onpop config)
           (.add-event-listener window "beforeunload" onleave config)
           pstore)))))
-
-(provide
-  (defun router (base route-map)
-    (let ((finder (route-finder base (hash-pairs route-map))))
-      (#({ state } emit)
-        (let ((route (finder (getf window 'location 'pathname))))
-          (.v route
-              (hash :state state
-                    :route (hash-merge (get-location)
-                                       (hash :params (getf route 'p)
-                                             :slug (getf route 's))))
-              emit))))))
-      

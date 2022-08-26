@@ -91,9 +91,6 @@
 (macro $td (props ...children)
   `($h "td" @props ...@children))
 
-(macro $span (props ...children)
-  `($h "span" @props ...@children))
-
 (macro $h1 (props ...children)
   `($h "h1" @props ...@children))
 
@@ -129,6 +126,12 @@
 
 (macro $sub (props ...children)
   `($h "sub" @props ...@children))
+
+(macro $br ()
+  `($h "br" () (nil)))
+
+(macro $hr ()
+  `($h "hr" () (nil)))
 
 (macro $form (props ...children)
   `($h "form" @props ...@children))

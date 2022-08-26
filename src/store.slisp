@@ -17,15 +17,6 @@
 (defmethod *effectful extract ()
   (getf this 'state))
 
-
-
-
-
-(defun guard (method allow-run? run-program)
-  (#(...args)
-    (cond ((allow-run?) (run-program ...args))
-          :else (error! "(store." method ") is disallowed during a dispatch!"))))
-
 (defun wrap-effectful (update)
   (#(state action dispatch)
     (let ((s (update state action dispatch)))
@@ -49,11 +40,11 @@
           (update (wrap-effectful update-state)))
       (setf store 'get-state (#()
                               (when (not idle)
-                                (error! "(store.get-state) is disallowed during a dispatch"))
+                                (error! "(silux/store.get-state) is disallowed during a dispatch"))
                               (hash :&state)))
       (setf store 'dispatch (#(action)
                               (when (not idle)
-                                (error! "(store.dispatch) is disallowed during a dispatch"))
+                                (error! "(silux/store.dispatch) is disallowed during a dispatch"))
                               (let ((dispatch (getf store 'dispatch)))
                                 (assign idle false)
                                 (assign pre-state state)
@@ -64,13 +55,13 @@
                                 store)))
       (setf store 'subscribe (#(subscription)
                               (when (not idle)
-                                (error! "(store.subscribe) is disallowed during a dispatch"))
+                                (error! "(silux/store.subscribe) is disallowed during a dispatch"))
                               (when (not (.has subs subscription))
                                 (.add subs subscription))
                               store))
       (setf store 'notify (#()
                             (when (not idle)
-                              (error! "(store.notify) is disallowed during a dispatch"))
+                              (error! "(silux/store.notify) is disallowed during a dispatch"))
                             (each subscription subs
                               (subscription (hash :&state)))
                             store))
