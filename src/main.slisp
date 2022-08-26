@@ -1,0 +1,40 @@
+(use "./connect" 
+  connect)
+(use "./store" 
+  make-store 
+  combine-updates 
+  (with-effects :as store-with-effects))
+(use "./renderer"
+  (h :as make-h))
+(use "./router"
+  router
+  router-store
+  navigate-to
+  resolve)
+
+(provide
+  (defconstant silux-connect connect))
+
+(provide
+  (defconstant silux-store make-store))
+
+(provide
+  (defconstant silux-fold-updates combine-updates))
+
+(provide
+  (defconstant with-effects store-with-effects))
+
+(provide
+  (defconstant h make-h))
+
+(provide
+  (defconstant silux-router router))
+
+(provide
+  (defconstant silux-router-plugin router-store))
+
+(provide
+  (defconstant go-route navigate-to))
+
+(provide
+  (defconstant resolve-route resolve))

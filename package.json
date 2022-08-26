@@ -1,0 +1,46 @@
+{
+  "name": "silux",
+  "version": "0.5.0",
+  "description": "A Sibilisp based flux framework",
+  "main": "main.js",
+  "module": "main.mjs",
+  "scripts": {
+    "compile-slisp": "sibilisp -s src/ -d compiled/",
+    "rollup-js": "rollup -c configs/rollup.config.js",
+    "build": "npm run compile-slisp && npm run rollup-js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/urbandrone/silux.git"
+  },
+  "keywords": [
+    "sibilisp",
+    "sibilant",
+    "flux",
+    "virtual",
+    "dom",
+    "functional",
+    "framework",
+    "frontend"
+  ],
+  "author": "David Hofmann <the.urban.drone@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/urbandrone/silux/issues"
+  },
+  "homepage": "https://github.com/urbandrone/silux#readme",
+  "dependencies": {
+    "snabbdom": "^3.5.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-buble": "^0.21.3",
+    "@rollup/plugin-commonjs": "^22.0.2",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "rollup": "^2.78.1",
+    "rollup-plugin-banner": "^0.2.1",
+    "rollup-plugin-filesize": "^9.1.2",
+    "rollup-plugin-terser": "^7.0.2",
+    "sibilisp": "^0.9.4"
+  }
+}

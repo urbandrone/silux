@@ -1,0 +1,154 @@
+(defun parse-search-params (params)
+  (|> (new URLSearchParams params)
+      (.entries)
+      (.reduce (#(acc [key value])
+                (setf acc key value)
+                acc)
+               (hash-create))))
+
+(defun get-location ()
+  (hash :url (getf window 'location 'href)
+        :origin (getf window 'location 'origin)
+        :host (getf window 'location 'hostname)
+        :port (getf window 'location 'port)
+        :protocol (getf location 'protocol)
+        :path (getf window 'location 'pathname)
+        :hash (getf window 'location 'hash)
+        :search (parse-search-params (getf window 'location 'search))))
+
+(defun partial-match? (a b i)
+  (eql? (getf b i) a))
+
+(defun hole? (x)
+  (partial-match? ":" x 0))
+
+(defun not-found-route? (x)
+  (.test (regex "^404$" 'g) x))
+
+
+(defun parts (x)
+  (.split x (regex "\\/" 'g)))
+
+(defun unslash (x)
+  (|> x
+      (.replace (regex "\\/+" 'g) "/")
+      (.replace (regex "^\\/|\\/$" 'g) "")))
+
+(defun specificity (slug path)
+  (let ((*slug (unslash slug))
+        (*path (unslash path)))
+    (cond ((eql? *slug *path) Infinity)
+          ((not-found-route? *slug) 0.5)
+          :else (let ((*p (parts *path))
+                      (*s (parts *slug)))
+                  (if (not (eql? (length *p) (length *s)))
+                      0
+                      (.reduce *s
+                              (#(a s i)
+                                (if (hole? s)
+                                    (+ 1 a)
+                                    (partial-match? s *p i)
+                                    (+ 2 a)
+                                    a))
+                              0))))))
+
+(defun params (slug path)
+  (let ((*slug (parts (unslash slug)))
+        (*path (parts (unslash path))))
+    (.reduce *slug
+             (#(a s i)
+              (if (hole? s)
+                  (let ((key (rest s)))
+                    (setf a key (getf *path i))
+                    a)
+                  a))
+             (hash-create))))
+
+;; (defun history-replace (url (data (hash)))
+;;   (.replace-state (getf window 'history) data "" url))
+
+(defun history-push (url (data (hash)))
+  (.push-state (getf window 'history) data "" url))
+                           
+(defun route-finder (base routes)
+  (#(path)
+    (|> routes
+        (.reduce (#(a [slug view])
+                  (let ((s (specificity (+ base slug) path)))
+                    (if (> s 0)
+                        (.concat a (hash :r s
+                                         :s slug
+                                         :p (params (+ base slug) path)
+                                         :v view))
+                        a)))
+                 (list))
+        (.sort (#(a b)
+                (cond ((> (getf a 'r) (getf b 'r)) -1)
+                      ((> (getf b 'r) (getf a 'r)) 1)
+                      :else 0)))
+        (first))))
+  
+  
+      
+    
+
+
+
+
+(defsum router-action ((move-to url action)
+                       (resolve url action)))
+
+(provide
+  (defun navigate-to (url action)
+    (router-action.move-to url action)))
+
+(provide
+  (defun resolve (url action)
+    (router-action.resolve url action)))
+
+(provide
+  (defun router-store ()
+    (#(store)
+      (let ((dispatch (getf store 'dispatch))
+            (notify (getf store 'notify))
+            (get-state (getf store 'get-state))
+            (pstore (hash-create)))
+        (setf pstore 'get-state (#()
+                                  (hash :state (getf (get-state) 'state)
+                                        :route (get-location))))
+        (setf pstore 'dispatch (#(action)
+                                (if (.is action-router action)
+                                    (match-sum action ((:resolve (url sub-action)
+                                                        ;; (history-replace url)
+                                                        (if (exists? sub-action)
+                                                            (dispatch sub-action)
+                                                            (notify)))
+                                                       (:move-to (url sub-action)
+                                                        (history-push url)
+                                                        (if (exists? sub-action)
+                                                            (dispatch sub-action)
+                                                            (notify)))))
+                                    (dispatch action))
+                                pstore))
+        (setf pstore 'subscribe (getf store 'subscribe))
+        (setf pstore 'notify notify)
+        (let* ((config (hash :passive true))
+               (onpop (#> (.dispatch pstore (resolve (getf location 'pathname)))))
+               (onleave (#> (.remove-event-listener window "popstate" onpop config)
+                            (.remove-event-listener window "beforeunload" onleave config))))
+          (.add-event-listener window "popstate" onpop config)
+          (.add-event-listener window "beforeunload" onleave config)
+          pstore)))))
+
+(provide
+  (defun router (base route-map)
+    (let ((finder (route-finder base (hash-pairs route-map))))
+      (#({ state } emit)
+        (let ((route (finder (getf window 'location 'pathname))))
+          (.v route
+              (hash :state state
+                    :route (hash-merge (get-location)
+                                       (hash :params (getf route 'p)
+                                             :slug (getf route 's))))
+              emit))))))
+      

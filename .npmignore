@@ -1,0 +1,6 @@
+# Files & Folders
+node_modules
+.vscode
+compiled
+src
+configs

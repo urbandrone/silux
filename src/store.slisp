@@ -1,0 +1,87 @@
+
+
+(deftype *effectful (state effects))
+
+(defmethod *effectful run (old-state subscribers dispatch)
+  (let ((self this))
+    (when (not (eql? (getf self 'state) old-state))
+      (each update-subscriber subscribers
+        (update-subscriber (hash :state (getf self 'state))))
+      (when (and (list? (getf self 'effects)) 
+                 (> (length (getf self 'effects)) 0))
+        (request-animation-frame 
+          (#> (each effect (getf self 'effects)
+                (call effect dispatch (getf self 'state)))))))
+    self))
+
+(defmethod *effectful extract ()
+  (getf this 'state))
+
+
+
+
+
+(defun guard (method allow-run? run-program)
+  (#(...args)
+    (cond ((allow-run?) (run-program ...args))
+          :else (error! "(store." method ") is disallowed during a dispatch!"))))
+
+(defun wrap-effectful (update)
+  (#(state action dispatch)
+    (let ((s (update state action dispatch)))
+      (when (not (.is *effectful s))
+        (assign s (*effectful s (list))))
+      s)))
+
+
+
+(provide
+  (defun with-effects (state ...effects)
+    (*effectful state effects)))
+
+(provide
+  (defun make-store (init-state update-state (plugins (list)))
+    (let ((state init-state)
+          (pre-state (nil))
+          (idle true)
+          (subs (mset))
+          (store (hash-create))
+          (update (wrap-effectful update-state)))
+      (setf store 'get-state (#()
+                              (when (not idle)
+                                (error! "(store.get-state) is disallowed during a dispatch"))
+                              (hash :&state)))
+      (setf store 'dispatch (#(action)
+                              (when (not idle)
+                                (error! "(store.dispatch) is disallowed during a dispatch"))
+                              (let ((dispatch (getf store 'dispatch)))
+                                (assign idle false)
+                                (assign pre-state state)
+                                (assign state (|> (update state action dispatch)
+                                                  (.run pre-state subs dispatch)
+                                                  (.extract)))
+                                (assign idle true)
+                                store)))
+      (setf store 'subscribe (#(subscription)
+                              (when (not idle)
+                                (error! "(store.subscribe) is disallowed during a dispatch"))
+                              (when (not (.has subs subscription))
+                                (.add subs subscription))
+                              store))
+      (setf store 'notify (#()
+                            (when (not idle)
+                              (error! "(store.notify) is disallowed during a dispatch"))
+                            (each subscription subs
+                              (subscription (hash :&state)))
+                            store))
+      (.reduce plugins
+               (#(pstore add-plugin) (add-plugin pstore))
+               store))))
+
+
+(provide
+  (defun combine-updates (...call-updates)
+    (#(state action dispatch)
+      (.reduce call-updates
+              (#(next-state call-update) (call-update next-state action dispatch))
+              state))))

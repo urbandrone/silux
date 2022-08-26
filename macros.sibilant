@@ -1,0 +1,182 @@
+(use "silux" h)
+
+(namespace silux)
+
+(macro $h (tag props ...children)
+  (var ps (pipe (bulk-map props.contents (#(k v) (list k v)))
+                (.reduce (#(a [k v])
+                           (if (= 'style k.token)
+                               (do (set a 'style (or (get a 'style) (list)))
+                                   (bulk-map v.contents
+                                             (#(sk sv)
+                                               (if (.starts-with sk.token "hook")
+                                                   (do (.push a.style (ternary (.ends-with sk.token "create") 'delayed 'remove))
+                                                       (.push a.style `(hash @(first sv.contents) @(last sv.contents))))
+                                                   (.push a.style sk sv)))))
+                               (.starts-with k.token "on")
+                               (do (set a 'on (or (get a 'on) (list)))
+                                   (.push a.on (.replace k.token (new RegExp "^on" "gi") "") v))
+                               (.starts-with k.token "data-")
+                               (do (set a 'dataset (or (get a 'dataset) (list)))
+                                   (.push a.dataset (.replace k.token (new RegExp "^data-" "gi") "") v))
+                               (.starts-with k.token "hook-")
+                               (do (set a 'hook (or (get a 'hook) (list)))
+                                   (.push a.hook (.replace k.token (new RegExp "^hook-" "gi") "") v))
+                               (= 'for k.token)
+                               (do (set a 'props (or (get a 'props) (list)))
+                                   (.push a.props 'html-for v))
+                               (= 'novalidate k.token)
+                               (do (set a 'props (or (get a 'props) (list)))
+                                   (.push a.props 'no-validate v))
+                               (= 'class k.token)
+                               (do (set a 'props (or (get a 'props) (list)))
+                                   (.push a.props 'class-name v))
+                               (do (set a 'props (or (get a 'props) (list)))
+                                   (.push a.props k.token v)))
+                           a)
+                         (hash))
+                (Object.entries)
+                (.flat-map (#([k v])
+                             (list k `(hash ...@v))))))
+  `(h @tag (hash ...@ps) (list ...@children)))
+
+(macro $div (props ...children)
+  `($h "div" @props ...@children))
+
+(macro $main (props ...children)
+  `($h "main" @props ...@children))
+
+(macro $section (props ...children)
+  `($h "section" @props ...@children))
+
+(macro $aside (props ...children)
+  `($h "aside" @props ...@children))
+
+(macro $article (props ...children)
+  `($h "article" @props ...@children))
+
+(macro $header (props ...children)
+  `($h "header" @props ...@children))
+
+(macro $footer (props ...children)
+  `($h "footer" @props ...@children))
+
+(macro $nav (props ...children)
+  `($h "nav" @props ...@children))
+
+(macro $ul (props ...children)
+  `($h "ul" @props ...@children))
+
+(macro $ol (props ...children)
+  `($h "ol" @props ...@children))
+
+(macro $li (props ...children)
+  `($h "li" @props ...@children))
+
+(macro $table (props ...children)
+  `($h "table" @props ...@children))
+
+(macro $thead (props ...children)
+  `($h "thead" @props ...@children))
+
+(macro $tbody (props ...children)
+  `($h "tbody" @props ...@children))
+
+(macro $th (props ...children)
+  `($h "th" @props ...@children))
+
+(macro $tr (props ...children)
+  `($h "tr" @props ...@children))
+
+(macro $td (props ...children)
+  `($h "td" @props ...@children))
+
+(macro $span (props ...children)
+  `($h "span" @props ...@children))
+
+(macro $h1 (props ...children)
+  `($h "h1" @props ...@children))
+
+(macro $h2 (props ...children)
+  `($h "h2" @props ...@children))
+
+(macro $h3 (props ...children)
+  `($h "h3" @props ...@children))
+
+(macro $h4 (props ...children)
+  `($h "h4" @props ...@children))
+
+(macro $h5 (props ...children)
+  `($h "h5" @props ...@children))
+
+(macro $h6 (props ...children)
+  `($h "h6" @props ...@children))
+
+(macro $p (props ...children)
+  `($h "p" @props ...@children))
+
+(macro $span (props ...children)
+  `($h "span" @props ...@children))
+
+(macro $strong (props ...children)
+  `($h "strong" @props ...@children))
+
+(macro $em (props ...children)
+  `($h "em" @props ...@children))
+
+(macro $sup (props ...children)
+  `($h "sup" @props ...@children))
+
+(macro $sub (props ...children)
+  `($h "sub" @props ...@children))
+
+(macro $form (props ...children)
+  `($h "form" @props ...@children))
+
+(macro $button (props ...children)
+  `($h "button" @props ...@children))
+
+(macro $label (props ...children)
+  `($h "label" @props ...@children))
+
+(macro $input (props ...children)
+  `($h "input" @props ...@children))
+
+(macro $output (props ...children)
+  `($h "output" @props ...@children))
+
+(macro $select (props ...children)
+  `($h "select" @props ...@children))
+
+(macro $textarea (props ...children)
+  `($h "textarea" @props ...@children))
+
+(macro $fieldset (props ...children)
+  `($h "fieldset" @props ...@children))
+
+(macro $legend (props ...children)
+  `($h "legend" @props ...@children))
+
+(macro $img (props ...children)
+  `($h "img" @props ...@children))
+
+(macro $picture (props ...children)
+  `($h "picture" @props ...@children))
+
+(macro $figure (props ...children)
+  `($h "figure" @props ...@children))
+
+(macro $caption (props ...children)
+  `($h "caption" @props ...@children))
+
+(macro $canvas (props ...children)
+  `($h "canvas" @props ...@children))
+
+(macro $video (props ...children)
+  `($h "video" @props ...@children))
+
+(macro $audio (props ...children)
+  `($h "audio" @props ...@children))
+
+(macro $source (props ...children)
+  `($h "source" @props ...@children))

@@ -1,0 +1,35 @@
+(use "snabbdom"
+  (h :as s-h)
+  props-module
+  style-module
+  event-listeners-module
+  dataset-module
+  (init :as s-init))
+
+
+
+(defvar *patch* 
+        (s-init (list props-module
+                      style-module
+                      event-listeners-module
+                      dataset-module)))
+
+
+(provide
+  (defun h (selector props children)
+    (s-h selector
+         (cond ((hash? props) props)
+               :else (hash-create))
+         (.map children
+               (#(child)
+                (cond ((number? child) (as-string child))
+                      :else child))))))
+
+
+(provide
+  (defun make-renderer (el)
+    (let (($el el))
+      (#(view state emit)
+        (let ((next-el (view state emit)))
+          (assign $el (*patch* $el next-el))
+          $el)))))
