@@ -1,32 +1,54 @@
 # silux
-A [sibilisp](https://github.com/urbandrone/sibilisp) based frontend framework and implementation of the flux architecture. Uses [snabbdom](https://github.com/snabbdom/snabbdom) as virtual DOM library.
+![NPM Downloads](https://img.shields.io/npm/dw/silux?color=343434&style=flat-square)
+![NPM Version](https://img.shields.io/npm/v/silux?color=343434&style=flat-square)
+![NPM License](https://img.shields.io/npm/l/silux?color=343434&style=flat-square)
+![Sibilisp](https://img.shields.io/badge/build%20with-Sibilisp-000000?style=flat-square)
 
+A [Sibilisp](https://github.com/urbandrone/sibilisp) based frontend framework and implementation of the Flux architecture, that uses [Snabbdom](https://github.com/snabbdom/snabbdom) as virtual DOM library. 
+
+### TL;DR
+
+Silux is...  
+* ...a state management framework for frontend applications
+* ...modular & extendable through a plugin architecture
+* ...build with a small API surface
+* ...equipped with special macros for VDOM creation
+* ...lightweight (`< 6 KB` when gzipped)
+* ...completely written in Sibilisp
+* ...usable in Sibilisp, Sibilant and JavaScript
+
+
+### Documentation
+
+
+
+### Basic example
 
 ```lisp
-;;;; Counter implementation
 (use "silux"
   silux-store
   silux-connect)
 
-(include "silux/macros")
-(import-namespace silux)
+(include "silux/macros") ; Include the silux macros for an JSX like
+(import-namespace silux) ; experience (see view function below)
 
-(defsum signal ((:init new-count)
-                (:modify amount)))
+(defsum signal ((:init new-state) ; Singals equal redux' actions
+                (:modify by-n)))                            
 
-(defun update (count sign)
+(defun update (state sign) ; A function to modify the current state
   (if (.is signal sign)
-      (match-sum sign ((:init (new-count)
-                        new-count)
-                       (:modify (amount)
-                        (+ count amount))))
-      count))
+      (match-sum sign ((:init (new-state) ; Pattern match incoming signals
+                        new-state)
+                       (:modify (by-n)
+                        (+ state by-n))))
+      state))
 
-(defun view ({state} emit)
-  ($div (:class "counter")
+(defun view ({state} emit) ; A function from state to VDOM
+  ($div (:class "counter") ; Macro time! 😁
     ($h1 (:class "counter_count")
-      (or (and (number? state) state)
-          ""))
+      (if (number? state) 
+          state
+          "-"))
     ($div (:class "counter_buttons")
       ($button (:class "counter_buttons_decr"
                 :type "button"
@@ -37,13 +59,13 @@ A [sibilisp](https://github.com/urbandrone/sibilisp) based frontend framework an
                 :onclick (#> (emit (signal.modify +1))))
         "+ 1"))))
 
-(defvar *run-app*
-        (silux-connect
-          (silux-store (nil) update)
-          (hash :el (.query-selector document "#counter")
-                :view view)))
+(defvar *run-app* ; *run-app* becomes the startup function
+        (silux-connect ; Connects...
+          (silux-store (nil) update) ; ...a store with no initial state...
+          (hash :el (.query-selector document "#counter") ; ...to a DOM element...
+                :view view))) ; ...and a VDOM creating function
 
-(call *run-app* (signal.init 0))
+(call *run-app* (signal.init 0)) ; Starts the app with an initial state of 0
 ```
 
 

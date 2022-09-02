@@ -64,6 +64,9 @@
 (macro $nav (props ...children)
   `($h "nav" @props ...@children))
 
+(macro $menu (props ...children)
+  `($h "menu" @props ...@children))
+
 (macro $ul (props ...children)
   `($h "ul" @props ...@children))
 
@@ -169,8 +172,8 @@
 (macro $figure (props ...children)
   `($h "figure" @props ...@children))
 
-(macro $caption (props ...children)
-  `($h "caption" @props ...@children))
+(macro $figcaption (props ...children)
+  `($h "figcaption" @props ...@children))
 
 (macro $canvas (props ...children)
   `($h "canvas" @props ...@children))

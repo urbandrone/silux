@@ -1,20 +1,18 @@
 (use "./renderer" 
   make-renderer)
 
-
-
 (provide
-  (defun connect (store display)
-    (let ((render (make-renderer (getf display 'el)))
-          (view (getf display 'view))
-          (dispatch (getf store 'dispatch))
-          ($el (getf display 'el)))
-      (.subscribe store (#(state)
-                          (assign $el (render view state dispatch))))
+  (defun connect (store ...displays)
+    (let ((dispatch (getf store 'dispatch))
+          (notify (getf store 'notify)))
+      (each display displays
+        (with-fields display (el view)
+          (let ((render (make-renderer el)))
+            (.subscribe store
+                        (#(state)
+                          (assign el (render view state dispatch)))))))
       (#(action)
         (if (exists? action)
-            (.dispatch store action)
-            (.notify store))
-        $el))))
-      
-    
+            (dispatch action)
+            (notify))
+        (nil)))))
