@@ -17,12 +17,19 @@ Silux is...
 * ...completely written in Sibilisp
 * ...usable in Sibilisp, Sibilant and JavaScript
 
+------
 
 ### Documentation
 
+Have a look into the [📖 wiki](https://github.com/urbandrone/silux/wiki/Documentation)!
 
+If you haven't used [Sibilisp](https://github.com/urbandrone/sibilisp) or [Sibilant](https://github.com/jbr/sibilant) before, check them out, both are really cool and fun. 😎
 
-### Basic example
+------
+
+### Example
+
+Showcases a basic counter implementation.
 
 ```lisp
 (use "silux"

@@ -12,7 +12,10 @@
                (hash-create))))
 
 (defun get-base-uri ()
-  (getf document 'body 'baseURI))
+  (let ((host (getf window 'location 'hostname)))
+    (|> (getf document 'body 'baseURI)
+        (.replace (regex (+ "^http(s)?:\\/\\/" host "\\/" "i"))
+                  ""))))
 
 (defun get-location ()
   (hash :url (getf window 'location 'href)

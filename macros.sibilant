@@ -118,23 +118,23 @@
 (macro $span (props ...children)
   `($h "span" @props ...@children))
 
-(macro $strong (props ...children)
-  `($h "strong" @props ...@children))
+(macro $strong (...children)
+  `($h "strong" () ...@children))
 
-(macro $em (props ...children)
-  `($h "em" @props ...@children))
+(macro $em (...children)
+  `($h "em" () ...@children))
 
-(macro $sup (props ...children)
-  `($h "sup" @props ...@children))
+(macro $sup (...children)
+  `($h "sup" () ...@children))
 
-(macro $sub (props ...children)
-  `($h "sub" @props ...@children))
+(macro $sub (...children)
+  `($h "sub" () ...@children))
 
 (macro $br ()
   `($h "br" () (nil)))
 
-(macro $hr ()
-  `($h "hr" () (nil)))
+(macro $hr (props)
+  `($h "hr" @props (nil)))
 
 (macro $form (props ...children)
   `($h "form" @props ...@children))
@@ -154,6 +154,9 @@
 (macro $select (props ...children)
   `($h "select" @props ...@children))
 
+(macro $option (props ...children)
+  `($h "option" @props ...@children))
+
 (macro $textarea (props ...children)
   `($h "textarea" @props ...@children))
 
@@ -163,8 +166,8 @@
 (macro $legend (props ...children)
   `($h "legend" @props ...@children))
 
-(macro $img (props ...children)
-  `($h "img" @props ...@children))
+(macro $img (props)
+  `($h "img" @props (nil)))
 
 (macro $picture (props ...children)
   `($h "picture" @props ...@children))
@@ -184,5 +187,92 @@
 (macro $audio (props ...children)
   `($h "audio" @props ...@children))
 
-(macro $source (props ...children)
-  `($h "source" @props ...@children))
+(macro $source (props)
+  `($h "source" @props (nil)))
+
+(macro $track (props)
+  `($h "track" @props (nil)))
+
+(macro $address (props ...children)
+  `($h "address" @props ...@children))
+
+(macro $blockquote (props ...children)
+  `($h "blockquote" @props ...@children))
+
+(macro $dl (props ...children)
+  `($h "dl" @props ...@children))
+
+(macro $dt (props ...children)
+  `($h "dt" @props ...@children))
+
+(macro $dd (props ...children)
+  `($h "dd" @props ...@children))
+
+(macro $dfn (props ...children)
+  `($h "dfn" @props ...@children))
+
+(macro $pre (props ...children)
+  `($h "pre" @props ...@children))
+
+(macro $code (props ...children)
+  `($h "code" @props ...@children))
+
+(macro $abbr (props ...children)
+  `($h "abbr" @props ...@children))
+
+(macro $bdi (props ...children)
+  `($h "bdi" @props ...@children))
+
+(macro $bdo (props ...children)
+  `($h "bdo" @props ...@children))
+
+(macro $cite (props ...children)
+  `($h "cite" @props ...@children))
+
+(macro $data (props ...children)
+  `($h "data" @props ...@children))
+
+(macro $rp (...children)
+  `($h "rp" () ...@children))
+
+(macro $rt (...children)
+  `($h "rt" () ...@children))
+
+(macro $kbd (...children)
+  `($h "kbd" () ...@children))
+
+(macro $mark (...children)
+  `($h "mark" () ...@children))
+
+(macro $ruby (...children)
+  `($h "ruby" () ...@children))
+
+(macro $small (...children)
+  `($h "small" () ...@children))
+
+(macro $b (props ...children)
+  `($h "b" @props ...@children))
+
+(macro $i (props ...children)
+  `($h "i" @props ...@children))
+
+(macro $s (props ...children)
+  `($h "s" @props ...@children))
+
+(macro $u (props ...children)
+  `($h "u" @props ...@children))
+
+(macro $q (props ...children)
+  `($h "q" @props ...@children))
+
+(macro $samp (...children)
+  `($h "samp" () ...@children))
+
+(macro $time (props ...children)
+  `($h "time" @props ...@children))
+
+(macro $var (...children)
+  `($h "var" () ...@children))
+
+(macro $wbr ()
+  `($h "wbr" () (nil)))
