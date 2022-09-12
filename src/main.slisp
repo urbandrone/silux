@@ -9,8 +9,7 @@
 (use "./router"
   router
   router-store
-  navigate-to
-  resolve)
+  navigate-to)
 
 (provide
   (defconstant silux-connect connect))
@@ -35,6 +34,3 @@
 
 (provide
   (defconstant go-route navigate-to))
-
-(provide
-  (defconstant resolve-route resolve))

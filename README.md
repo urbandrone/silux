@@ -13,7 +13,7 @@ Silux is...
 * ...modular & extendable through a plugin architecture
 * ...build with a small API surface
 * ...equipped with special macros for VDOM creation
-* ...lightweight (`< 6 KB` when gzipped)
+* ...lightweight (`5 KB` when gzipped)
 * ...completely written in Sibilisp
 * ...usable in Sibilisp, Sibilant and JavaScript
 
@@ -34,12 +34,13 @@ Showcases a basic counter implementation.
 ```lisp
 (use "silux"
   silux-store
-  silux-connect)
+  silux-connect
+  h)
 
-(include "silux/macros") ; Include the silux macros for an JSX like
+(include "silux/vdom") ; Include the silux macros for an JSX like
 (import-namespace silux) ; experience (see view function below)
 
-(defsum signal ((:init new-state) ; Singals equal redux' actions
+(defsum signal ((:init new-state) ; Singals communicate a state change
                 (:modify by-n)))                            
 
 (defun update (state sign) ; A function to modify the current state

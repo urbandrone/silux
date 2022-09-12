@@ -32,7 +32,7 @@ module.exports = {
         forOf: false
       }
     }),
-    terser(),
+    //terser(),
     banner(`silux ${pkg.version} | ${pkg.license} | ${REPO}`),
     filesize()
   ]

@@ -6,16 +6,17 @@
 (defun parse-search-params (params)
   (|> (new URLSearchParams params)
       (.entries)
+      (as-list)
       (.reduce (#(acc [key value])
                 (setf acc key value)
                 acc)
                (hash-create))))
 
 (defun get-base-uri ()
-  (let ((host (getf window 'location 'hostname)))
+  (let ((host (getf window 'location 'host))
+        (http (getf window 'location 'protocol)))
     (|> (getf document 'body 'baseURI)
-        (.replace (regex (+ "^http(s)?:\\/\\/" host "\\/" "i"))
-                  ""))))
+        (.replace (+ http "//" host) ""))))
 
 (defun get-location ()
   (hash :url (getf window 'location 'href)
@@ -78,10 +79,7 @@
                   a))
              (hash-create))))
 
-;; (defun history-replace (url (data (hash)))
-;;   (.replace-state (getf window 'history) data "" url))
-
-(defun history-push (url (data (hash)))
+(defun history-push (url (data (nil)))
   (.push-state (getf window 'history) data "" url))
                            
 (defun route-finder (base routes)
@@ -104,7 +102,7 @@
 
 (provide
   (defun router (route-map)
-    (let ((finder (route-finder (get-base-ui) 
+    (let ((finder (route-finder (get-base-uri) 
                                 (hash-pairs route-map))))
       (#({ state } emit)
         (let ((route (finder (getf window 'location 'pathname))))
@@ -118,18 +116,15 @@
               (get-error-route (getf window 'location 'pathname))))))))
 
 
+
 ;;; router-plugin related
 ;;; ---------------------
-(defsum router-action ((move-to url action)
-                       (resolve url action)))
+
+(deftype router-navigate (url action))
 
 (provide
   (defun navigate-to (url action)
-    (router-action.move-to url action)))
-
-(provide
-  (defun resolve (url action)
-    (router-action.resolve url action)))
+    (router-navigate url action)))
 
 (provide
   (defun router-store ()
@@ -142,25 +137,19 @@
                                   (hash :state (getf (get-state) 'state)
                                         :route (get-location))))
         (setf pstore 'dispatch (#(action)
-                                (if (.is action-router action)
-                                    (match-sum action ((:resolve (url sub-action)
-                                                        ;; (history-replace url)
-                                                        (if (exists? sub-action)
-                                                            (dispatch sub-action)
-                                                            (notify)))
-                                                       (:move-to (url sub-action)
-                                                        (history-push url)
-                                                        (if (exists? sub-action)
-                                                            (dispatch sub-action)
-                                                            (notify)))))
+                                (if (.is router-navigate action)
+                                    (do 
+                                      (history-push (getf action 'url))
+                                      (if (exists? (getf action 'action))
+                                          (dispatch (getf action 'action))
+                                          (notify)))
                                     (dispatch action))
                                 pstore))
         (setf pstore 'subscribe (getf store 'subscribe))
         (setf pstore 'notify notify)
         (let* ((config (hash :passive true))
-               (onpop (#> (.dispatch pstore (resolve (getf location 'pathname)))))
-               (onleave (#> (.remove-event-listener window "popstate" onpop config)
+               (onleave (#> (.remove-event-listener window "popstate" notify config)
                             (.remove-event-listener window "beforeunload" onleave config))))
-          (.add-event-listener window "popstate" onpop config)
+          (.add-event-listener window "popstate" notify config)
           (.add-event-listener window "beforeunload" onleave config)
           pstore)))))
