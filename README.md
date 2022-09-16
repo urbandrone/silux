@@ -4,7 +4,7 @@
 ![NPM License](https://img.shields.io/npm/l/silux?color=343434&style=flat-square)
 ![Sibilisp](https://img.shields.io/badge/build%20with-Sibilisp-000000?style=flat-square)
 
-A [Sibilisp](https://github.com/urbandrone/sibilisp) based frontend framework and implementation of the Flux architecture, that uses [Snabbdom](https://github.com/snabbdom/snabbdom) as virtual DOM library. 
+A [Sibilisp](https://github.com/urbandrone/sibilisp) based frontend framework and implementation of the Flux architecture, uses [Snabbdom](https://github.com/snabbdom/snabbdom) as virtual DOM library. 
 
 ### TL;DR
 
@@ -12,8 +12,8 @@ Silux is...
 * ...a state management framework for frontend applications
 * ...modular & extendable through a plugin architecture
 * ...build with a small API surface
-* ...equipped with special macros for VDOM creation
 * ...lightweight (`5 KB` when gzipped)
+* ...equipped with special macros for virtual DOM creation and routing.
 * ...completely written in Sibilisp
 * ...usable in Sibilisp, Sibilant and JavaScript
 
@@ -21,9 +21,9 @@ Silux is...
 
 ### Documentation
 
-Have a look into the [📖 wiki](https://github.com/urbandrone/silux/wiki/Documentation)!
+Have a look into the [📖 API docs](https://github.com/urbandrone/silux/wiki/Documentation)!
 
-If you haven't used [Sibilisp](https://github.com/urbandrone/sibilisp) or [Sibilant](https://github.com/jbr/sibilant) before, check them out, both are really cool and fun. 😎
+If you haven't used [Sibilisp](https://github.com/urbandrone/sibilisp) or [Sibilant](https://github.com/jbr/sibilant) before, check them out, both are fun to use 😎
 
 ------
 

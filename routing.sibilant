@@ -19,12 +19,13 @@
                       (= prop.token 'url))
                   (do (assign hr value)
                       (.push ps 'href value))
+                  (= prop.token 'target)
+                  (.push ps 'target value)
                   (= prop.token 'class)
                   (.push ps 'class-name value)
                   (= prop.token 'emitter)
                   (assign em value)
                   (= prop.token 'signal)
-                  ; handle signal somehow...
                   (assign sn value)
                   (return)))) ;skip
   (when (exists? em)
